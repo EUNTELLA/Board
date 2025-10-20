@@ -1,0 +1,77 @@
+.App-header {
+  display: flex;
+  justify-content: space-between; /* 요소들을 양쪽 끝으로 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 0 40px;
+  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 왼쪽 영역 (로고 + 네비게이션) */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* 로고와 메뉴 사이 간격 */
+}
+
+.main-title a {
+  text-decoration: none;
+  color: #2DBF9A; /* 그린 오로라 테마 색상 */
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navigation a {
+  text-decoration: none;
+  color: #333;
+  margin-left: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navigation a:hover {
+  color: #2DBF9A;
+}
+
+/* 오른쪽 영역 (사용자 정보/버튼) */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info span {
+  font-weight: 500;
+  margin-right: 15px;
+}
+
+.header-button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.login-button:hover {
+  background-color: #e0e0e0;
+}
+
+.signup-button, .logout-button {
+  background-color: #2DBF9A;
+  color: white;
+}
+
+.signup-button:hover, .logout-button:hover {
+  background-color: #26a385;
+}

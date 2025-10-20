@@ -1,0 +1,70 @@
+.post-detail-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.post-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.post-header h1 {
+    margin: 0;
+}
+
+.post-meta {
+    margin-top: 10px;
+    color: #777;
+    font-size: 14px;
+}
+
+.post-meta span+span {
+    margin-left: 15px;
+}
+
+.post-content {
+    line-height: 1.8;
+    font-size: 16px;
+    min-height: 200px;
+}
+
+.post-actions {
+    margin-top: 30px;
+    text-align: right;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.action-button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.edit-button {
+    background-color: #2DBF9A;
+    color: white;
+}
+
+.delete-button {
+    background-color: #e53e3e;
+    color: white;
+}

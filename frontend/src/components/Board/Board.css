@@ -1,0 +1,50 @@
+.borad-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.borad-container h2 {
+    color:#555;
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.post-list {
+    list-style: none;
+    padding: 0;
+}
+
+.post-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+.post-item:hover {
+    background-color: #f9f9f9;
+}
+
+.post-title {
+    color: #555;
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+.post-author {
+    width: 120px;
+    text-align: center;
+    color: #555;
+}
+
+.post-date {
+    width: 150px;
+    text-align: right;
+    color: #777;
+}
