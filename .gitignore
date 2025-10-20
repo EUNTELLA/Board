@@ -1,20 +1,15 @@
-# Node
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Python
+# Python 가상환경
 .venv/
 __pycache__/
+*.pyc
 
-# Build output
+# Node.js 의존성
+node_modules/
+
+# 환경 변수 파일
+.env
+
+# 로그 / 캐시 / 빌드 산출물
+*.log
 dist/
 build/
-
-# Environment files
-.env
-*.env
-
-# OS
-.DS_Store
-Thumbs.db
