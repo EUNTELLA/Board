@@ -10,64 +10,78 @@ import './App.css';
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
-
-    // --- CRUD를 위한 상태 추가 ---
     const [currentView, setCurrentView] = useState('list');
-    // [오류 해결] selectedPost 상태 변수를 선언합니다.
     const [selectedPost, setSelectedPost] = useState(null);
-    // ---
+
+    // --- [추가] 게시판 새로고침을 위한 상태 ---
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const API_URL = 'http://localhost:3001/posts';
 
     const toggleChat = () => setIsChatOpen(!isChatOpen);
 
-    // --- CRUD 관련 핸들러 함수들 ---
     const handleBackToList = () => {
         setCurrentView('list');
-        setSelectedPost(null);
+        setSelectedPost(null); // selectedPost를 null로 초기화
+        setRefreshKey(prevKey => prevKey + 1); // +1을 해서 상태 변경을 알림
     };
 
     const handlePostSelect = (postId) => {
-        setSelectedPost({ id: postId });
+        setSelectedPost(postId);
         setCurrentView('detail');
     };
+    const handleNewPost = () => { setSelectedPost(null); setCurrentView('form'); };
+    const handleEditPost = (post) => { setSelectedPost(post); setCurrentView('form'); };
 
-    const handleNewPost = () => {
-        setSelectedPost(null);
-        setCurrentView('form');
-    };
-
-    const handleEditPost = (post) => {
-        setSelectedPost(post);
-        setCurrentView('form');
-    };
-
-    const handleDeletePost = (postId) => {
-        if (window.confirm(`정말로 ${postId}번 글을 삭제하시겠습니까?`)) {
-            console.log(`${postId}번 글 삭제 API 호출`);
-            alert('게시글이 삭제되었습니다.');
-            handleBackToList();
+    const handleDeletePost = async (postId) => {
+        if (window.confirm(`정말로 이 글을 삭제하시겠습니까?`)) {
+            try {
+                const response = await fetch(`${API_URL}/${postId}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('삭제 실패');
+                alert('게시글이 삭제되었습니다.');
+                handleBackToList(); // 삭제 후 목록으로 돌아가면서 새로고침
+            } catch (error) {
+                console.error('삭제 오류:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            }
         }
     };
 
-    const handleFormSubmit = (postData) => {
-        if (selectedPost && selectedPost.id) {
-            console.log(`${selectedPost.id}번 글 수정 API 호출:`, postData);
-            alert('게시글이 수정되었습니다.');
-        } else {
-            console.log('새 글 생성 API 호출:', postData);
-            alert('새로운 게시글이 작성되었습니다.');
+    const handleFormSubmit = async (postData) => {
+        try {
+            let response;
+            if (selectedPost && selectedPost._id) {
+                response = await fetch(`${API_URL}/${selectedPost._id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData),
+                });
+                if (!response.ok) throw new Error('수정 실패');
+                alert('게시글이 수정되었습니다.');
+            } else {
+                response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(postData),
+                });
+                if (!response.ok) throw new Error('생성 실패');
+                alert('새로운 게시글이 작성되었습니다.');
+            }
+            handleBackToList(); // 저장 후 목록으로 돌아가면서 새로고침
+        } catch (error) {
+            console.error('저장 오류:', error);
+            alert('저장 중 오류가 발생했습니다.');
         }
-        handleBackToList();
     };
 
-    // --- 뷰 렌더링 함수 ---
     const renderMainContent = () => {
         switch (currentView) {
             case 'detail':
-                return <PostDetail postId={selectedPost.id} onBackToList={handleBackToList} onEdit={handleEditPost} onDelete={handleDeletePost} />;
+                return <PostDetail postId={selectedPost} onBackToList={handleBackToList} onEdit={handleEditPost} onDelete={handleDeletePost} />;
             case 'form':
                 return <PostForm post={selectedPost} onSubmit={handleFormSubmit} onCancel={handleBackToList} />;
             default:
-                return <Board onPostClick={handlePostSelect} onNewPostClick={handleNewPost} />;
+                return <Board onPostClick={handlePostSelect} onNewPostClick={handleNewPost} refreshKey={refreshKey} />;
         }
     };
 
@@ -84,4 +98,3 @@ function App() {
 }
 
 export default App;
-

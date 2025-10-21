@@ -2,26 +2,41 @@ import React, { useState, useEffect } from 'react';
 import Pagination from './Pagination';
 import './Board.css';
 
-const Board = ({ onPostClick, onNewPostClick }) => {
+const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
     const [posts, setPosts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const sampleData = {
-            posts: Array.from({ length: 53 }, (_, i) => ({ id: 53 - i, title: `페이지네이션 테스트 게시글 ${53 - i}`, author: `작성자${i + 1}`, date: `2025-10-19` })),
-            totalPages: 6,
+        const fetchPosts = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch(`http://localhost:3001/posts?page=${currentPage}`);
+                if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+                const data = await response.json();
+                setPosts(data.posts);
+                setTotalPages(data.totalPages);
+            } catch (error) {
+                console.error('게시글 목록 로딩 실패:', error);
+                alert('게시글 목록을 불러올 수 없습니다.');
+            } finally {
+                setIsLoading(false);
+            }
         };
-        const postsPerPage = 10;
-        const startIndex = (currentPage - 1) * postsPerPage;
-        setPosts(sampleData.posts.slice(startIndex, startIndex + postsPerPage));
-        setTotalPages(sampleData.totalPages);
-    }, [currentPage]);
+
+        fetchPosts();
+        // [수정] refreshKey가 바뀔 때마다 fetchPosts 함수를 다시 호출하여 목록을 새로고침합니다.
+    }, [currentPage, refreshKey]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
         window.scrollTo(0, 0);
     };
+
+    if (isLoading) {
+        return <div className="board-container"><h2>게시글을 불러오는 중...</h2></div>;
+    }
 
     return (
         <div className="board-container">
@@ -31,12 +46,12 @@ const Board = ({ onPostClick, onNewPostClick }) => {
             </div>
             <ul className="post-list">
                 {posts.map(post => (
-                    <li key={post.id} className="post-item">
-                        <span className="post-title" onClick={() => onPostClick(post.id)}>
+                    <li key={post._id} className="post-item">
+                        <span className="post-title" onClick={() => onPostClick(post._id)}>
                             {post.title}
                         </span>
                         <span className="post-author">{post.author}</span>
-                        <span className="post-date">{post.date}</span>
+                        <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
                     </li>
                 ))}
             </ul>

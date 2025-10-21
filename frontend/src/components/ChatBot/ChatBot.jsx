@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-// CSS 파일 import를 추가합니다. (이전에 인라인 스타일로 작업했기 때문에)
 import './ChatBot.css';
 
 const ChatBot = () => {
@@ -13,10 +12,6 @@ const ChatBot = () => {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // --- 1. 샘플 데이터와 데모 응답 함수를 모두 삭제합니다. ---
-  // const samplePosts = [...];
-  // const generateDemoResponse = (...) => { ... };
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -25,31 +20,27 @@ const ChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // --- 2. sendMessage 함수를 실제 API 호출 로직으로 수정합니다. ---
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
 
     const userMessage = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
 
-    const currentInput = input; // 현재 입력값을 변수에 저장
+    const currentInput = input;
     setInput('');
     setLoading(true);
 
     try {
-      // FastAPI 서버(http://localhost:8000)에 POST 요청을 보냅니다.
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: currentInput, // 저장해둔 입력값 사용
-          // 대화 기록을 함께 보내 LLM이 문맥을 파악하도록 돕습니다. (최근 6개)
+          message: currentInput,
           conversation_history: messages.slice(-6),
         }),
       });
 
       if (!response.ok) {
-        // API 서버에서 에러가 발생한 경우
         throw new Error('API 서버에서 오류가 발생했습니다.');
       }
 
@@ -58,13 +49,12 @@ const ChatBot = () => {
       const assistantMessage = {
         role: 'assistant',
         content: data.message,
-        posts: data.posts || null, // API 응답에 posts가 있을 경우 함께 저장
+        posts: data.posts || null,
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
     } catch (error) {
       console.error('챗봇 API 호출 오류:', error);
-      // 사용자에게 에러 메시지를 보여줍니다.
       setMessages((prev) => [
         ...prev,
         {
@@ -88,7 +78,6 @@ const ChatBot = () => {
     setInput(text);
   };
 
-  // --- 3. 인라인 스타일을 CSS 클래스로 변경합니다. ---
   return (
     <div className="chatbot-popup-container">
       <div className="chatbot-header">
@@ -108,14 +97,17 @@ const ChatBot = () => {
                 {msg.posts && msg.posts.length > 0 && (
                   <div className="post-results">
                     {msg.posts.map((post) => (
-                      <div key={post.id} className="post-card">
+                      // [수정] MongoDB의 ID는 _id 입니다.
+                      <div key={post._id} className="post-card">
                         <h4>{post.title}</h4>
                         <div className="post-meta">
                           <span>👁️ {post.views || 0}</span>
-                          <span>💬 {post.comments || 0}</span>
+                          {/* [오류 해결] post.comments 배열 자체가 아닌, .length로 개수를 표시합니다. */}
+                          <span>💬 {post.comments ? post.comments.length : 0}</span>
                           <span>📅 {new Date(post.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <a href={`/posts/${post.id}`} target="_blank" rel="noopener noreferrer" className="post-link">
+                        {/* [수정] 링크에도 _id를 사용합니다. */}
+                        <a href={`/posts/${post._id}`} target="_blank" rel="noopener noreferrer" className="post-link">
                           자세히 보기 →
                         </a>
                       </div>
