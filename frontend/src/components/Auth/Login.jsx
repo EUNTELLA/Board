@@ -22,7 +22,7 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
         setError('');
 
         if (!formData.email || !formData.password) {
-            setError('모든 필드를 입력해주세요.');
+            setError('Please fill in all fields.');
             return;
         }
 
@@ -37,10 +37,9 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || '로그인에 실패했습니다.');
+                throw new Error(data.message || 'Login failed.');
             }
 
-            // 로그인 성공 시 토큰과 사용자 정보 저장
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             onLogin(data.user);
@@ -55,41 +54,41 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <h2>로그인</h2>
+                <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="email">이메일</label>
+                        <label htmlFor="email">Email</label>
                         <input
                             type="email"
                             id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="이메일을 입력하세요"
+                            placeholder="Enter your email"
                             disabled={isLoading}
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">비밀번호</label>
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="비밀번호를 입력하세요"
+                            placeholder="Enter your password"
                             disabled={isLoading}
                         />
                     </div>
                     {error && <div className="error-message">{error}</div>}
                     <button type="submit" className="auth-button" disabled={isLoading}>
-                        {isLoading ? '로그인 중...' : '로그인'}
+                        {isLoading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
                 <div className="auth-switch">
-                    계정이 없으신가요?{' '}
+                    Don't have an account?{' '}
                     <button onClick={onSwitchToSignup} className="link-button">
-                        회원가입
+                        Sign Up
                     </button>
                 </div>
             </div>

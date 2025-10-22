@@ -18,12 +18,11 @@ const PostForm = ({ post, onSubmit, onCancel, currentUser }) => {
     }, [post]);
 
     const handleSubmit = (e) => {
-        e.preventDefault(); // 폼 기본 동작 방지
+        e.preventDefault();
         if (!title || !content) {
-            alert('제목과 내용을 모두 입력해주세요.');
+            alert('Please enter both title and content.');
             return;
         }
-        // 로그인한 사용자의 이름을 author로 사용
         onSubmit({
             title,
             content,
@@ -33,31 +32,31 @@ const PostForm = ({ post, onSubmit, onCancel, currentUser }) => {
 
     return (
         <div className="post-form-container">
-            <h2>{post ? '게시글 수정' : '새 글 작성'}</h2>
+            <h2>{post ? 'Edit Post' : 'New Post'}</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="title">제목</label>
+                    <label htmlFor="title">Title</label>
                     <input
                         id="title"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="제목을 입력하세요"
+                        placeholder="Enter title"
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="content">내용</label>
+                    <label htmlFor="content">Content</label>
                     <textarea
                         id="content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="내용을 입력하세요"
+                        placeholder="Enter content"
                         rows="10"
                     />
                 </div>
                 <div className="form-actions">
-                    <button type="button" onClick={onCancel} className="cancel-button">취소</button>
-                    <button type="submit" className="submit-button">저장</button>
+                    <button type="button" onClick={onCancel} className="cancel-button">Cancel</button>
+                    <button type="submit" className="submit-button">Save</button>
                 </div>
             </form>
         </div>

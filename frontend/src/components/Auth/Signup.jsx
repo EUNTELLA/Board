@@ -23,19 +23,18 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
         e.preventDefault();
         setError('');
 
-        // 유효성 검사
         if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-            setError('모든 필드를 입력해주세요.');
+            setError('Please fill in all fields.');
             return;
         }
 
         if (formData.password.length < 6) {
-            setError('비밀번호는 최소 6자 이상이어야 합니다.');
+            setError('Password must be at least 6 characters.');
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setError('비밀번호가 일치하지 않습니다.');
+            setError('Passwords do not match.');
             return;
         }
 
@@ -54,10 +53,9 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || '회원가입에 실패했습니다.');
+                throw new Error(data.message || 'Signup failed.');
             }
 
-            // 회원가입 성공 시 자동 로그인
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             onSignup(data.user);
@@ -72,65 +70,65 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <h2>회원가입</h2>
+                <h2>Sign Up</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="username">사용자 이름</label>
+                        <label htmlFor="username">Username</label>
                         <input
                             type="text"
                             id="username"
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
-                            placeholder="사용자 이름을 입력하세요"
+                            placeholder="Enter your username"
                             disabled={isLoading}
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="email">이메일</label>
+                        <label htmlFor="email">Email</label>
                         <input
                             type="email"
                             id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="이메일을 입력하세요"
+                            placeholder="Enter your email"
                             disabled={isLoading}
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="password">비밀번호</label>
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
                             id="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="비밀번호를 입력하세요 (최소 6자)"
+                            placeholder="Enter password (min 6 characters)"
                             disabled={isLoading}
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="confirmPassword">비밀번호 확인</label>
+                        <label htmlFor="confirmPassword">Confirm Password</label>
                         <input
                             type="password"
                             id="confirmPassword"
                             name="confirmPassword"
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            placeholder="비밀번호를 다시 입력하세요"
+                            placeholder="Re-enter password"
                             disabled={isLoading}
                         />
                     </div>
                     {error && <div className="error-message">{error}</div>}
                     <button type="submit" className="auth-button" disabled={isLoading}>
-                        {isLoading ? '가입 중...' : '회원가입'}
+                        {isLoading ? 'Signing up...' : 'Sign Up'}
                     </button>
                 </form>
                 <div className="auth-switch">
-                    이미 계정이 있으신가요?{' '}
+                    Already have an account?{' '}
                     <button onClick={onSwitchToLogin} className="link-button">
-                        로그인
+                        Login
                     </button>
                 </div>
             </div>

@@ -19,13 +19,13 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
                     url += `&search=${encodeURIComponent(searchKeyword)}`;
                 }
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
+                if (!response.ok) throw new Error('Failed to load data.');
                 const data = await response.json();
                 setPosts(data.posts);
                 setTotalPages(data.totalPages);
             } catch (error) {
-                console.error('게시글 목록 로딩 실패:', error);
-                alert('게시글 목록을 불러올 수 없습니다.');
+                console.error('Failed to load posts:', error);
+                alert('Unable to load posts.');
             } finally {
                 setIsLoading(false);
             }
@@ -53,30 +53,30 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
     };
 
     if (isLoading) {
-        return <div className="board-container"><h2>게시글을 불러오는 중...</h2></div>;
+        return <div className="board-container"><h2>Loading posts...</h2></div>;
     }
 
     return (
         <div className="board-container">
             <div className="board-header">
-                <h2>게시글</h2>
-                <button onClick={onNewPostClick} className="new-post-button">새 글 작성</button>
+                <h2>Posts</h2>
+                <button onClick={onNewPostClick} className="new-post-button">New Post</button>
             </div>
 
             <div className="search-section">
-                <h3>게시글 검색</h3>
+                <h3>Search Posts</h3>
                 <form onSubmit={handleSearch} className="search-form">
                     <input
                         type="text"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="제목이나 내용으로 검색..."
+                        placeholder="Search by title or content..."
                         className="search-input"
                     />
-                    <button type="submit" className="search-button">검색</button>
+                    <button type="submit" className="search-button">Search</button>
                     {searchKeyword && (
                         <button type="button" onClick={handleSearchClear} className="clear-button">
-                            초기화
+                            Clear
                         </button>
                     )}
                 </form>

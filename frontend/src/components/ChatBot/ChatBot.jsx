@@ -5,7 +5,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: '안녕하세요! 게시판 검색을 도와드릴게요. 무엇을 찾으시나요?',
+      content: 'Hello! I can help you search the board. What are you looking for?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -41,7 +41,7 @@ const ChatBot = () => {
       });
 
       if (!response.ok) {
-        throw new Error('API 서버에서 오류가 발생했습니다.');
+        throw new Error('An error occurred with the API server.');
       }
 
       const data = await response.json();
@@ -54,12 +54,12 @@ const ChatBot = () => {
       setMessages((prev) => [...prev, assistantMessage]);
 
     } catch (error) {
-      console.error('챗봇 API 호출 오류:', error);
+      console.error('Chatbot API error:', error);
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: '죄송합니다. 서버와 통신하는 중 오류가 발생했습니다.',
+          content: 'Sorry, an error occurred while communicating with the server.',
         },
       ]);
     } finally {
@@ -81,8 +81,8 @@ const ChatBot = () => {
   return (
     <div className="chatbot-popup-container">
       <div className="chatbot-header">
-        <h3>AI 검색 도우미</h3>
-        <p>게시글을 자연어로 검색해보세요</p>
+        <h3>AI Search Assistant</h3>
+        <p>Search posts with natural language</p>
       </div>
 
       <div className="chatbot-messages">
@@ -108,7 +108,7 @@ const ChatBot = () => {
                         </div>
 
                         <a href={`/posts/${post._id}`} target="_blank" rel="noopener noreferrer" className="post-link">
-                          자세히 보기 →
+                          View Details →
                         </a>
                       </div>
                     ))}
@@ -139,20 +139,20 @@ const ChatBot = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="예: 최근 React 관련 글 보여줘"
+          placeholder="e.g., Show me recent React posts"
           disabled={loading}
         />
         <button onClick={sendMessage} disabled={loading || !input.trim()}>
-          {loading ? '...' : '전송'}
+          {loading ? '...' : 'Send'}
         </button>
       </div>
 
       <div className="chatbot-examples">
-        <p>💡 이렇게 물어보세요:</p>
+        <p>💡 Try asking:</p>
         <div className="example-buttons">
-          <button onClick={() => handleExampleClick('최근 작성된 글 보여줘')}>최근 글</button>
-          <button onClick={() => handleExampleClick('인기있는 게시글 추천해줘')}>인기 글</button>
-          <button onClick={() => handleExampleClick('React 관련 글 찾아줘')}>주제 검색</button>
+          <button onClick={() => handleExampleClick('Show me recent posts')}>Recent</button>
+          <button onClick={() => handleExampleClick('Popular posts')}>Popular</button>
+          <button onClick={() => handleExampleClick('Find React posts')}>Search</button>
         </div>
       </div>
     </div>

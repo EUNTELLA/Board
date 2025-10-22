@@ -8,48 +8,35 @@ from models.schemas import ChatMessage
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "phi3:mini")
 
-# --- [수정] 검색 의도를 더 잘 인식하도록 프롬프트 개선 ---
+
 SYSTEM_PROMPT_EXTRACT_INTENT = """
-You are an intent classifier for a bulletin board chatbot. Analyze the user's message and respond in JSON format.
+You are a keyword extractor for bulletin board search. Extract ONLY the search keyword from user's message.
 
-**Search Query Patterns (type: "search"):**
-- Latest posts: "최신글", "최근 글", "최근 게시글", "latest posts"
-- Popular posts: "인기글", "조회수 많은 글", "인기있는 글", "popular posts"
-- Posts with many comments: "댓글 많은 글", "댓글이 많은 글", "댓글 많은거", "most commented"
-- Keyword search: "리액트 관련", "파이썬 글", "fastapi", "about react"
-- Specific counts: "3개", "5개 보여줘", "show me 10 posts"
+**Examples:**
+Input: "123 관련 글 찾아줘" → Output: {{"type": "search", "keyword": "123", "sort": "latest", "limit": 3}}
+Input: "React about" → Output: {{"type": "search", "keyword": "React", "sort": "latest", "limit": 3}}
+Input: "은짱이 쓴 글" → Output: {{"type": "search", "keyword": "은짱", "sort": "latest", "limit": 3}}
+Input: "latest posts" → Output: {{"type": "search", "keyword": "", "sort": "latest", "limit": 3}}
+Input: "최신글" → Output: {{"type": "search", "keyword": "", "sort": "latest", "limit": 3}}
+Input: "popular" → Output: {{"type": "search", "keyword": "", "sort": "popular", "limit": 5}}
+Input: "인기글" → Output: {{"type": "search", "keyword": "", "sort": "popular", "limit": 5}}
+Input: "hi" → Output: {{"type": "general", "message": "Hello! What are you looking for?"}}
 
-**General Conversation (type: "general"):**
-- Greetings: "안녕", "hi", "hello"
-- Thanks: "고마워", "감사", "thanks"
-- Random talk: "너 바보야?", "날씨 어때?", "장난하냐"
+**Keyword Extraction Rules:**
+1. Extract the MAIN subject from the message
+2. Remove filler words: "관련", "글", "찾아줘", "알려줘", "보여줘", "쓴", "about", "posts", "show", "find"
+3. Korean tech terms → English: "리액트"→"React", "파이썬"→"Python"
+4. Keep numbers as-is: "123"→"123"
+5. Keep names as-is: "은짱"→"은짱"
 
-**JSON Response Format:**
+**Sort Detection:**
+- "latest", "최신", "최근", "recent" → sort: "latest"
+- "popular", "인기", "조회수" → sort: "popular", limit: 5
+- "comments", "댓글" → sort: "comments", limit: 5
+- Default → sort: "latest"
 
-For SEARCH queries:
-{{"type": "search", "keyword": "검색키워드 (없으면 빈문자열)", "sort": "latest|popular|comments", "limit": 3}}
-
-For GENERAL conversation:
-{{"type": "general", "message": "응답 메시지"}}
-
-**Important Rules:**
-1. If user asks about "댓글", "comment" → set sort: "comments", limit: 5
-2. If user asks about "인기", "조회수", "popular" → set sort: "popular", limit: 5
-3. If user asks about "최신", "최근", "latest" → set sort: "latest"
-4. If user specifies a number (e.g., "3개", "10개") → use that as limit
-5. Default limit is 3
-6. Extract keyword - **CONVERT Korean tech terms to English:**
-   - "리액트" → "React"
-   - "파이썬" → "Python"
-   - "자바스크립트" → "JavaScript"
-   - "타입스크립트" → "TypeScript"
-   - "넥스트" → "Next"
-   - "네스트" → "Nest"
-   - For other terms, keep as is
-
----
-User's message: "{user_message}"
-Your JSON response:
+User: "{user_message}"
+JSON:
 """
 
 async def extract_search_intent(user_message: str, history: List[ChatMessage]):
@@ -66,14 +53,20 @@ async def extract_search_intent(user_message: str, history: List[ChatMessage]):
             format='json',
             options={'temperature': 0.0}
         )
-        # 챗봇이 생성한 응답이 general 메시지일 경우, 좀 더 적절한 답변으로 교체
         result = json.loads(response['message']['content'])
         if result.get("type") == "general":
-             result["message"] = "게시판에 대해 무엇이 궁금하세요? '최신글', '인기글' 등으로 검색해보세요."
+             result["message"] = "What would you like to know about the board? Try searching for 'recent posts', 'popular posts', etc."
 
         # 한글 키워드를 영어로 변환 (LLM이 못할 경우를 대비)
         if result.get("type") == "search" and result.get("keyword"):
             keyword = result["keyword"]
+
+            # 불필요한 단어 제거
+            remove_words = ["관련", "글", "쓴", "작성한", "에 대한", "대해", "찾아", "알려", "보여", "게시글", "포스트"]
+            for word in remove_words:
+                keyword = keyword.replace(word, "").strip()
+
+            # 한글 기술용어를 영어로 변환
             keyword_map = {
                 "리액트": "React",
                 "파이썬": "Python",
@@ -87,32 +80,32 @@ async def extract_search_intent(user_message: str, history: List[ChatMessage]):
             for kr, en in keyword_map.items():
                 if kr in keyword:
                     keyword = keyword.replace(kr, en)
-            result["keyword"] = keyword
+
+            result["keyword"] = keyword.strip()
 
         return result
 
     except Exception as e:
-        print(f"Ollama({OLLAMA_MODEL}) 의도추출 Error: {e}")
-        return {"type": "general", "message": "죄송합니다. 요청을 분석하는 중 오류가 발생했습니다."}
+        print(f"Ollama({OLLAMA_MODEL}) intent extraction error: {e}")
+        return {"type": "general", "message": "Sorry, an error occurred while analyzing your request."}
 
 async def format_search_results(posts: List[dict], user_query: str):
     if not posts:
-        return "아쉽지만 검색 결과가 없습니다. 다른 키워드로 다시 시도해 보세요."
+        return "No results found. Please try a different keyword."
 
-    # 간단한 룰 기반 응답 생성 (LLM 대신 빠르고 정확한 응답)
     query_lower = user_query.lower()
 
     if "댓글" in user_query or "comment" in query_lower:
-        return f"댓글이 많은 글 {len(posts)}개를 찾았습니다."
+        return f"Found {len(posts)} posts with most comments."
     elif "인기" in user_query or "조회수" in user_query or "popular" in query_lower:
-        return f"가장 인기 있는 글 {len(posts)}개를 찾았습니다."
-    elif "최신" in user_query or "최근" in user_query or "latest" in query_lower:
-        return f"최근 작성된 글 {len(posts)}개를 찾았습니다."
+        return f"Found {len(posts)} most popular posts."
+    elif "최신" in user_query or "최근" in user_query or "latest" in query_lower or "recent" in query_lower:
+        return f"Found {len(posts)} recent posts."
     else:
-        # 키워드 추출 (보여줘, 알려줘 등 제거)
-        keyword = user_query.replace("보여줘", "").replace("알려줘", "").replace("관련", "").replace("글", "").strip()
-        if keyword:
-            return f"'{keyword}' 관련 글 {len(posts)}개를 찾았습니다."
+        # Extract keyword
+        keyword = user_query.replace("show", "").replace("find", "").replace("posts", "").replace("about", "").strip()
+        if keyword and len(keyword) > 1:
+            return f"Found {len(posts)} posts about '{keyword}'."
         else:
-            return f"검색 결과 {len(posts)}개의 글을 찾았습니다."
+            return f"Found {len(posts)} posts."
 
