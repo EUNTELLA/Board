@@ -1,3 +1,8 @@
+// 제목 내용 입력 폼
+// 새글 작성 모드랑 수정모드
+// jwt 토큰을 사용한 api
+// 폼 유효성 검사
+
 import React, { useState, useEffect } from 'react';
 import './PostForm.css';
 

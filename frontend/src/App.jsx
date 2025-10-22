@@ -15,12 +15,10 @@ function App() {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [currentView, setCurrentView] = useState('list');
     const [selectedPost, setSelectedPost] = useState(null);
-    const [authView, setAuthView] = useState('login'); // 'login' or 'signup'
-
-    // --- [추가] 게시판 새로고침을 위한 상태 ---
+    const [authView, setAuthView] = useState('login'); // 'login' or 'signup' 
     const [refreshKey, setRefreshKey] = useState(0);
 
-    // 로컬 스토리지에서 로그인 상태 확인
+    // 페이지 새로 고침 후에도 로그인 상태 유지하기 위한 함수
     useEffect(() => {
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user');

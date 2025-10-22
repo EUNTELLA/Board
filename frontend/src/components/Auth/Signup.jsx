@@ -52,10 +52,11 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
 
             const data = await response.json();
 
+
             if (!response.ok) {
                 throw new Error(data.message || 'Signup failed.');
             }
-
+            // 회원가입 성공 시 토큰과 사용자 정보를 로컬 스토리지에 저장
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             onSignup(data.user);

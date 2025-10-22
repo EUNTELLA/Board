@@ -1,4 +1,5 @@
-// OnModuleInit을 @nestjs/common에서 import 합니다.
+// 게시글 비즈니스 로직 
+
 import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -73,7 +74,7 @@ export class PostsService implements OnModuleInit {
   }
 
 
-
+  // 댓글 추가 
   async addComment(postId: string, commentData: CreateCommentDto): Promise<Post> {
     const post = await this.findOne(postId);
     post.comments.push(commentData as any);
@@ -83,6 +84,7 @@ export class PostsService implements OnModuleInit {
 
   async findAll(page: number = 1, limit: number = 10, search: string = '', sort: string = 'latest') {
     const skip = (page - 1) * limit;
+    //검색 필터 : 제목, 내용, 작성자에서 검색 
     const filter = search ? {
       $or: [
         { title: { $regex: search, $options: 'i' } },

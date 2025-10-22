@@ -69,6 +69,8 @@ app.add_middleware(
 
 logger.info("FastAPI application initialized")
 
+# 챗봇 메세지 처리 엔드 포인트 
+
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     logger.info(f"Received chat request: {request.message[:50]}...")

@@ -1,3 +1,5 @@
+# ollama를 통한 llm 호출 및 키워드 추출
+
 import os
 import json
 import ollama

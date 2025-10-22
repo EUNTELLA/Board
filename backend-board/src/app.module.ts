@@ -1,3 +1,5 @@
+// nestJS 애플리케이션의 루트 모듈
+
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
@@ -6,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    // 1. .env 파일을 사용하기 위한 ConfigModule 설정
+    // 1. .env 파일을 사용하기 위해
     ConfigModule.forRoot({
       isGlobal: true, // 모든 모듈에서 process.env 사용 가능
     }),

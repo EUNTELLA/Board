@@ -1,3 +1,5 @@
+# 게시판 API 호출
+
 import os
 import httpx
 from typing import List,Dict

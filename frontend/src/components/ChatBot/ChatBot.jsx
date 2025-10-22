@@ -36,7 +36,7 @@ const ChatBot = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: currentInput,
-          conversation_history: messages.slice(-6),
+          conversation_history: messages.slice(-6), // 최근 메세지 6개만 전송
         }),
       });
 
@@ -49,7 +49,7 @@ const ChatBot = () => {
       const assistantMessage = {
         role: 'assistant',
         content: data.message,
-        posts: data.posts || null,
+        posts: data.posts || null, // 검색 결과 게시글 배열
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
@@ -77,7 +77,8 @@ const ChatBot = () => {
   const handleExampleClick = (text) => {
     setInput(text);
   };
-
+  // 검색 결과 표시 
+  // 조회수 , 댓글 수 , 작성일을 포함한 게시글 카드 
   return (
     <div className="chatbot-popup-container">
       <div className="chatbot-header">
