@@ -97,16 +97,16 @@ const ChatBot = () => {
                 {msg.posts && msg.posts.length > 0 && (
                   <div className="post-results">
                     {msg.posts.map((post) => (
-                      // [수정] MongoDB의 ID는 _id 입니다.
+
                       <div key={post._id} className="post-card">
                         <h4>{post.title}</h4>
                         <div className="post-meta">
                           <span>👁️ {post.views || 0}</span>
-                          {/* [오류 해결] post.comments 배열 자체가 아닌, .length로 개수를 표시합니다. */}
+
                           <span>💬 {post.comments ? post.comments.length : 0}</span>
                           <span>📅 {new Date(post.createdAt).toLocaleDateString()}</span>
                         </div>
-                        {/* [수정] 링크에도 _id를 사용합니다. */}
+
                         <a href={`/posts/${post._id}`} target="_blank" rel="noopener noreferrer" className="post-link">
                           자세히 보기 →
                         </a>

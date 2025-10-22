@@ -3,17 +3,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  height: 64px;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  /* 반투명 블러 효과 */
-  border-bottom: 1px solid #E5E7EB;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: sticky;
-  /* 스크롤 시 상단에 고정 */
   top: 0;
   z-index: 999;
   width: calc(100% - 80px);
-  /* padding 값을 뺀 실제 너비 */
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
 }
 
 .header-left {
@@ -24,22 +23,51 @@
 
 .main-title a {
   text-decoration: none;
-  color: #111827;
-  font-size: 22px;
-  font-weight: 700;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(240, 147, 251, 0.5);
+  transition: all 0.3s ease;
+}
+
+.main-title a:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 20px rgba(245, 87, 108, 0.6));
 }
 
 .navigation a {
   text-decoration: none;
-  color: #4B5563;
+  color: rgba(255, 255, 255, 0.9);
   margin-left: 20px;
-  font-size: 16px;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 8px 16px;
+}
+
+.navigation a::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #f093fb, #f5576c);
+  transition: width 0.3s ease;
 }
 
 .navigation a:hover {
-  color: #2DBF9A;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.navigation a:hover::before {
+  width: 100%;
 }
 
 .header-right {
@@ -49,37 +77,73 @@
 }
 
 .user-info span {
-  font-weight: 500;
+  font-weight: 600;
   margin-right: 15px;
-  color: #374151;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .header-button {
   border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px 24px;
+  border-radius: 50px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.header-button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .login-button {
-  background-color: #F3F4F6;
-  color: #374151;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .login-button:hover {
-  background-color: #E5E7EB;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
 }
 
 .signup-button,
 .logout-button {
-  background-color: #2DBF9A;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
 }
 
 .signup-button:hover,
 .logout-button:hover {
-  background-color: #26a385;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(245, 87, 108, 0.6);
+}
+
+.welcome-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
 }

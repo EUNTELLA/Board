@@ -81,11 +81,37 @@ export class PostsService implements OnModuleInit {
     return post;
   }
 
-  async findAll(page: number = 1, limit: number = 10, search: string = '') {
+  async findAll(page: number = 1, limit: number = 10, search: string = '', sort: string = 'latest') {
     const skip = (page - 1) * limit;
-    const filter = search ? { $or: [{ title: { $regex: search, $options: 'i' } }, { content: { $regex: search, $options: 'i' } }] } : {};
+    const filter = search ? {
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } }
+      ]
+    } : {};
+
+    // 정렬 옵션 설정
+    let sortOption: any = { createdAt: -1 }; // 기본: 최신순
+    if (sort === 'popular') {
+      sortOption = { views: -1 }; // 조회수 많은 순
+    } else if (sort === 'comments') {
+      // 댓글 많은 순 (comments 배열 길이로 정렬하기 위해 aggregate 사용)
+      const posts = await this.postModel.aggregate([
+        { $match: filter },
+        { $addFields: { commentCount: { $size: '$comments' } } },
+        { $sort: { commentCount: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+      ]).exec();
+
+      const totalPosts = await this.postModel.countDocuments(filter).exec();
+      const totalPages = Math.ceil(totalPosts / limit);
+      return { posts, currentPage: page, totalPages };
+    }
+
     const [posts, totalPosts] = await Promise.all([
-      this.postModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      this.postModel.find(filter).sort(sortOption).skip(skip).limit(limit).exec(),
       this.postModel.countDocuments(filter).exec(),
     ]);
     const totalPages = Math.ceil(totalPosts / limit);

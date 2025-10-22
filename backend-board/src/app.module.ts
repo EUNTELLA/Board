@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PostsModule } from './posts/posts.module';
     // 2. MongoDB 연결 설정
     MongooseModule.forRoot(process.env.MONGODB_URI),
     PostsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

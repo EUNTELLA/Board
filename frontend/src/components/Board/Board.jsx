@@ -7,12 +7,18 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [searchInput, setSearchInput] = useState(''); // 입력 중인 검색어
 
     useEffect(() => {
         const fetchPosts = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`http://localhost:3001/posts?page=${currentPage}`);
+                let url = `http://localhost:3001/posts?page=${currentPage}`;
+                if (searchKeyword) {
+                    url += `&search=${encodeURIComponent(searchKeyword)}`;
+                }
+                const response = await fetch(url);
                 if (!response.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
                 const data = await response.json();
                 setPosts(data.posts);
@@ -26,12 +32,24 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
         };
 
         fetchPosts();
-        // [수정] refreshKey가 바뀔 때마다 fetchPosts 함수를 다시 호출하여 목록을 새로고침합니다.
-    }, [currentPage, refreshKey]);
+
+    }, [currentPage, refreshKey, searchKeyword]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
         window.scrollTo(0, 0);
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setSearchKeyword(searchInput); // 입력한 값을 실제 검색어로 설정
+        setCurrentPage(1); // 검색 시 첫 페이지로 이동
+    };
+
+    const handleSearchClear = () => {
+        setSearchInput('');
+        setSearchKeyword('');
+        setCurrentPage(1);
     };
 
     if (isLoading) {
@@ -41,19 +59,43 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
     return (
         <div className="board-container">
             <div className="board-header">
-                <h2>최신 게시글</h2>
+                <h2>게시글</h2>
                 <button onClick={onNewPostClick} className="new-post-button">새 글 작성</button>
             </div>
+
+            <div className="search-section">
+                <h3>게시글 검색</h3>
+                <form onSubmit={handleSearch} className="search-form">
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="제목이나 내용으로 검색..."
+                        className="search-input"
+                    />
+                    <button type="submit" className="search-button">검색</button>
+                    {searchKeyword && (
+                        <button type="button" onClick={handleSearchClear} className="clear-button">
+                            초기화
+                        </button>
+                    )}
+                </form>
+            </div>
+
             <ul className="post-list">
-                {posts.map(post => (
-                    <li key={post._id} className="post-item">
-                        <span className="post-title" onClick={() => onPostClick(post._id)}>
-                            {post.title}
-                        </span>
-                        <span className="post-author">{post.author}</span>
-                        <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
-                    </li>
-                ))}
+                {posts.length === 0 ? (
+                    <li className="no-posts">검색 결과가 없습니다.</li>
+                ) : (
+                    posts.map(post => (
+                        <li key={post._id} className="post-item">
+                            <span className="post-title" onClick={() => onPostClick(post._id)}>
+                                {post.title}
+                            </span>
+                            <span className="post-author">{post.author}</span>
+                            <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
+                        </li>
+                    ))
+                )}
             </ul>
             <Pagination
                 currentPage={currentPage}

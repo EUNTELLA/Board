@@ -5,20 +5,54 @@ import PostDetail from './components/Board/PostDetail';
 import PostForm from './components/Board/PostForm';
 import ChatIcon from './components/ChatBot/ChatIcon';
 import ChatBot from './components/ChatBot/ChatBot';
+import Login from './components/Auth/Login';
+import Signup from './components/Auth/Signup';
 import './App.css';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [currentView, setCurrentView] = useState('list');
     const [selectedPost, setSelectedPost] = useState(null);
+    const [authView, setAuthView] = useState('login'); // 'login' or 'signup'
 
     // --- [추가] 게시판 새로고침을 위한 상태 ---
     const [refreshKey, setRefreshKey] = useState(0);
 
+    // 로컬 스토리지에서 로그인 상태 확인
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        if (token && user) {
+            setIsLoggedIn(true);
+            setCurrentUser(JSON.parse(user));
+        }
+    }, []);
+
     const API_URL = 'http://localhost:3001/posts';
 
     const toggleChat = () => setIsChatOpen(!isChatOpen);
+
+    const handleLogin = (user) => {
+        setIsLoggedIn(true);
+        setCurrentUser(user);
+        setCurrentView('list');
+    };
+
+    const handleSignup = (user) => {
+        setIsLoggedIn(true);
+        setCurrentUser(user);
+        setCurrentView('list');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+        setCurrentView('list');
+    };
 
     const handleBackToList = () => {
         setCurrentView('list');
@@ -75,11 +109,20 @@ function App() {
     };
 
     const renderMainContent = () => {
+        // 로그인하지 않은 경우 로그인/회원가입 화면 표시
+        if (!isLoggedIn) {
+            if (authView === 'signup') {
+                return <Signup onSignup={handleSignup} onSwitchToLogin={() => setAuthView('login')} />;
+            }
+            return <Login onLogin={handleLogin} onSwitchToSignup={() => setAuthView('signup')} />;
+        }
+
+        // 로그인한 경우 게시판 화면 표시
         switch (currentView) {
             case 'detail':
                 return <PostDetail postId={selectedPost} onBackToList={handleBackToList} onEdit={handleEditPost} onDelete={handleDeletePost} />;
             case 'form':
-                return <PostForm post={selectedPost} onSubmit={handleFormSubmit} onCancel={handleBackToList} />;
+                return <PostForm post={selectedPost} onSubmit={handleFormSubmit} onCancel={handleBackToList} currentUser={currentUser} />;
             default:
                 return <Board onPostClick={handlePostSelect} onNewPostClick={handleNewPost} refreshKey={refreshKey} />;
         }
@@ -87,12 +130,12 @@ function App() {
 
     return (
         <div className="App">
-            <Header isLoggedIn={isLoggedIn} />
+            <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} currentUser={currentUser} />
             <main>
                 {renderMainContent()}
             </main>
-            <ChatIcon onClick={toggleChat} />
-            {isChatOpen && <ChatBot />}
+            {isLoggedIn && <ChatIcon onClick={toggleChat} />}
+            {isLoggedIn && isChatOpen && <ChatBot />}
         </div>
     );
 }

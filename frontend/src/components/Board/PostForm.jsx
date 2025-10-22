@@ -4,7 +4,8 @@ import './PostForm.css';
 // post: 수정할 때 전달받는 기존 글 데이터
 // onSubmit: '저장' 버튼 클릭 시 실행될 함수
 // onCancel: '취소' 버튼 클릭 시 실행될 함수
-const PostForm = ({ post, onSubmit, onCancel }) => {
+// currentUser: 로그인한 사용자 정보
+const PostForm = ({ post, onSubmit, onCancel, currentUser }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
 
@@ -22,8 +23,12 @@ const PostForm = ({ post, onSubmit, onCancel }) => {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
         }
-        // author는 실제로는 로그인 정보에서 가져와야 합니다.
-        onSubmit({ title, content, author: 'GenAI' });
+        // 로그인한 사용자의 이름을 author로 사용
+        onSubmit({
+            title,
+            content,
+            author: currentUser?.username || currentUser?.email || 'Anonymous'
+        });
     };
 
     return (

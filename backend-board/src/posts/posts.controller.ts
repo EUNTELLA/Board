@@ -22,8 +22,10 @@ export class PostsController {
   async getPosts(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('search') search: string = '',
+    @Query('sort') sort: string = 'latest',
   ) {
-    return this.postsService.findAll(page, limit);
+    return this.postsService.findAll(page, limit, search, sort);
   }
 
   @Get(':id')

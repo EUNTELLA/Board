@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # MongoDB 데이터베이스
+  mongodb:
+    image: mongo:7.0
+    container_name: genai-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=boarddb
+    networks:
+      - genai-network
+
+  # Backend Board (NestJS)
+  backend-board:
+    build:
+      context: ./backend-board
+      dockerfile: Dockerfile
+    container_name: genai-backend-board
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/boarddb
+      - JWT_SECRET=your-secret-key-change-this
+    depends_on:
+      - mongodb
+    networks:
+      - genai-network
+
+  # Backend Chatbot (FastAPI + Ollama)
+  backend-chatbot:
+    build:
+      context: ./backend-chatbot
+      dockerfile: Dockerfile
+    container_name: genai-backend-chatbot
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_MODEL=phi3:mini
+      - BOARD_API_URL=http://backend-board:3001
+    networks:
+      - genai-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: genai-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-board
+      - backend-chatbot
+    networks:
+      - genai-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  genai-network:
+    driver: bridge

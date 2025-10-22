@@ -1,38 +1,36 @@
 
-
 import React from 'react';
-import './Header.css'; 
+import './Header.css';
 
-function Header({isLoggedIn}) {
+function Header({ isLoggedIn, onLogout, currentUser }) {
   return (
     <header className="App-header">
       <div className="header-left">
         <h1 className="main-title">
           <a href="/">Board</a>
         </h1>
-        <nav className="navigation">
-          <a href="/posts">게시글</a>
-          <a href="/new-post">글쓰기</a>
-        </nav>
-      </div>
-
-
-      <div className="header-right">
-        {isLoggedIn ? (
-          // 로그인이 된 경우
-          <div className="user-info">
-            <span>환영합니다, GenAI님!</span>
-            <button className="header-button logout-button">로그아웃</button>
-          </div>
-        ) : (
-          // 로그인이 안 된 경우
-          <div className="auth-buttons">
-            <button className="header-button login-button">로그인</button>
-            <button className="header-button signup-button">회원가입</button>
-          </div>
+        {isLoggedIn && (
+          <nav className="navigation">
+            <a href="/posts">게시글</a>
+            <a href="/new-post">글쓰기</a>
+          </nav>
         )}
       </div>
 
+      <div className="header-right">
+        {isLoggedIn ? (
+          <div className="user-info">
+            <span>환영합니다, {currentUser?.username || 'GenAI'}님!</span>
+            <button className="header-button logout-button" onClick={onLogout}>
+              로그아웃
+            </button>
+          </div>
+        ) : (
+          <div className="auth-buttons">
+            <span className="welcome-text">게시판에 오신 것을 환영합니다!</span>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
