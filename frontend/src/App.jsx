@@ -7,7 +7,6 @@ import ChatIcon from './components/ChatBot/ChatIcon';
 import ChatBot from './components/ChatBot/ChatBot';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
-import './App.css';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -127,9 +126,9 @@ function App() {
     };
 
     return (
-        <div className="App">
+        <div className="text-center">
             <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} currentUser={currentUser} />
-            <main>
+            <main className="px-5">
                 {renderMainContent()}
             </main>
             {isLoggedIn && <ChatIcon onClick={toggleChat} />}

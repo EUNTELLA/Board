@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Pagination from './Pagination';
-import './Board.css';
 
 /**
  * Board Component
@@ -107,35 +106,57 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
     // === 로딩 중일 때 렌더링 ===
     // 데이터를 불러오는 동안 로딩 메시지 표시
     if (isLoading) {
-        return <div className="board-container"><h2>Loading posts...</h2></div>;
+        return (
+            <div className="max-w-[1000px] my-10 mx-auto p-10 bg-white/10 backdrop-blur-[20px] backdrop-saturate-[180%] rounded-[30px] shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/20 animate-float">
+                <h2>Loading posts...</h2>
+            </div>
+        );
     }
 
     // === 메인 UI 렌더링 ===
     return (
-        <div className="board-container">
+        <div className="max-w-[1000px] my-10 mx-auto p-10 bg-white/10 backdrop-blur-[20px] backdrop-saturate-[180%] rounded-[30px] shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/20 animate-float">
             {/* 게시판 헤더: 타이틀 + 새 글 작성 버튼 */}
-            <div className="board-header">
-                <h2>Posts</h2>
-                <button onClick={onNewPostClick} className="new-post-button">New Post</button>
+            <div className="flex justify-between items-center border-b-2 border-white/20 pb-6 mb-8">
+                <h2 className="m-0 text-[32px] font-black bg-gradient-to-r from-white to-pink-300 bg-clip-text text-transparent tracking-tight">
+                    Posts
+                </h2>
+                <button
+                    onClick={onNewPostClick}
+                    className="border-none py-3.5 px-8 rounded-full text-[15px] font-bold cursor-pointer bg-gradient-to-r from-pink-300 to-red-400 text-white transition-all duration-500 shadow-[0_10px_30px_rgba(245,87,108,0.5)] relative overflow-hidden uppercase tracking-wide before:content-[''] before:absolute before:top-0 before:-left-full before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:-translate-y-1 hover:scale-105 hover:shadow-[0_15px_40px_rgba(245,87,108,0.7)]"
+                >
+                    New Post
+                </button>
             </div>
 
             {/* 검색 섹션 */}
-            <div className="search-section">
-                <h3>Search Posts</h3>
-                <form onSubmit={handleSearch} className="search-form">
+            <div className="mb-9 p-6 bg-white/10 backdrop-blur-[10px] rounded-[20px] border border-white/15 shadow-[0_8px_32px_rgba(31,38,135,0.2)]">
+                <h3 className="m-0 mb-5 text-xl font-extrabold bg-gradient-to-r from-white to-red-400 bg-clip-text text-transparent">
+                    Search Posts
+                </h3>
+                <form onSubmit={handleSearch} className="flex gap-3 items-center">
                     {/* 검색어 입력 필드 */}
                     <input
                         type="text"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         placeholder="Search by title or content..."
-                        className="search-input"
+                        className="flex-1 py-3.5 px-5 border-2 border-white/20 rounded-full text-[15px] transition-all duration-300 bg-white/10 text-white font-medium placeholder:text-white/50 focus:outline-none focus:border-pink-300 focus:bg-white/15 focus:shadow-[0_0_25px_rgba(240,147,251,0.5)]"
                     />
                     {/* 검색 버튼 */}
-                    <button type="submit" className="search-button">Search</button>
+                    <button
+                        type="submit"
+                        className="py-3.5 px-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-none rounded-full text-[15px] font-bold cursor-pointer transition-all duration-300 shadow-[0_5px_20px_rgba(102,126,234,0.4)] uppercase tracking-wide hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(102,126,234,0.6)]"
+                    >
+                        Search
+                    </button>
                     {/* 검색어가 있을 때만 Clear 버튼 표시 */}
                     {searchKeyword && (
-                        <button type="button" onClick={handleSearchClear} className="clear-button">
+                        <button
+                            type="button"
+                            onClick={handleSearchClear}
+                            className="py-3.5 px-7 bg-white/20 text-white border border-white/30 backdrop-blur-[10px] rounded-full text-[15px] font-bold cursor-pointer transition-all duration-300 uppercase tracking-wide hover:bg-white/30 hover:-translate-y-1"
+                        >
                             Clear
                         </button>
                     )}
@@ -143,22 +164,34 @@ const Board = ({ onPostClick, onNewPostClick, refreshKey }) => {
             </div>
 
             {/* 게시글 목록 */}
-            <ul className="post-list">
+            <ul className="list-none p-0">
                 {posts.length === 0 ? (
                     // 게시글이 없을 때
-                    <li className="no-posts">검색 결과가 없습니다.</li>
+                    <li className="text-center py-16 text-white/70 text-lg font-semibold">
+                        검색 결과가 없습니다.
+                    </li>
                 ) : (
                     // 게시글 목록 매핑
                     posts.map(post => (
-                        <li key={post._id} className="post-item">
+                        <li
+                            key={post._id}
+                            className="flex justify-between items-center py-5 px-4 border-b border-white/10 transition-all duration-300 rounded-2xl mb-1 last:border-b-0 hover:bg-white/15 hover:translate-x-2.5 hover:shadow-[0_5px_20px_rgba(240,147,251,0.3)]"
+                        >
                             {/* 게시글 제목 (클릭 시 상세 페이지로 이동) */}
-                            <span className="post-title" onClick={() => onPostClick(post._id)}>
+                            <span
+                                className="font-semibold flex-grow cursor-pointer text-white/95 transition-all duration-300 hover:text-pink-300 hover:drop-shadow-[0_0_15px_rgba(240,147,251,0.8)]"
+                                onClick={() => onPostClick(post._id)}
+                            >
                                 {post.title}
                             </span>
                             {/* 작성자 */}
-                            <span className="post-author">{post.author}</span>
+                            <span className="w-[140px] text-center text-white/70 text-sm font-medium">
+                                {post.author}
+                            </span>
                             {/* 작성일 (로케일 형식으로 표시) */}
-                            <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
+                            <span className="w-[150px] text-right text-white/60 text-[13px]">
+                                {new Date(post.createdAt).toLocaleDateString()}
+                            </span>
                         </li>
                     ))
                 )}

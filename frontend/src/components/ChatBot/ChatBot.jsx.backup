@@ -1,0 +1,163 @@
+import React, { useState, useRef, useEffect } from 'react';
+
+const ChatBot = () => {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: 'Hello! I can help you search the board. What are you looking for?',
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMessage = { role: 'user', content: input };
+    setMessages((prev) => [...prev, userMessage]);
+
+    const currentInput = input;
+    setInput('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: currentInput,
+          conversation_history: messages.slice(-6), // 최근 메세지 6개만 전송
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('An error occurred with the API server.');
+      }
+
+      const data = await response.json();
+
+      const assistantMessage = {
+        role: 'assistant',
+        content: data.message,
+        posts: data.posts || null, // 검색 결과 게시글 배열
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+
+    } catch (error) {
+      console.error('Chatbot API error:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Sorry, an error occurred while communicating with the server.',
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const handleExampleClick = (text) => {
+    setInput(text);
+  };
+  // 검색 결과 표시 
+  // 조회수 , 댓글 수 , 작성일을 포함한 게시글 카드 
+  return (
+    <div className="chatbot-popup-container">
+      <div className="chatbot-header">
+        <h3>AI Search Assistant</h3>
+        <p>Search posts with natural language</p>
+      </div>
+
+      <div className="chatbot-messages">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`message ${msg.role}`}>
+            <div className="message-content">
+              <div className="message-avatar">
+                {msg.role === 'user' ? '👤' : '🤖'}
+              </div>
+              <div className="message-text">
+                <p>{msg.content}</p>
+                {msg.posts && msg.posts.length > 0 && (
+                  <div className="post-results">
+                    {msg.posts.map((post) => (
+
+                      <div key={post._id} className="post-card">
+                        <h4>{post.title}</h4>
+                        <div className="post-meta">
+                          <span>👁️ {post.views || 0}</span>
+
+                          <span>💬 {post.comments ? post.comments.length : 0}</span>
+                          <span>📅 {new Date(post.createdAt).toLocaleDateString()}</span>
+                        </div>
+
+                        <a href={`/posts/${post._id}`} target="_blank" rel="noopener noreferrer" className="post-link">
+                          View Details →
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div className="message assistant">
+            <div className="message-content">
+              <div className="message-avatar">🤖</div>
+              <div className="message-text">
+                <div className="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="chatbot-input">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="e.g., Show me recent React posts"
+          disabled={loading}
+        />
+        <button onClick={sendMessage} disabled={loading || !input.trim()}>
+          {loading ? '...' : 'Send'}
+        </button>
+      </div>
+
+      <div className="chatbot-examples">
+        <p>💡 Try asking:</p>
+        <div className="example-buttons">
+          <button onClick={() => handleExampleClick('Show me recent posts')}>Recent</button>
+          <button onClick={() => handleExampleClick('Popular posts')}>Popular</button>
+          <button onClick={() => handleExampleClick('Find React posts')}>Search</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChatBot;
+

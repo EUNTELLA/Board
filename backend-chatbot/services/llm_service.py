@@ -53,7 +53,11 @@ async def extract_search_intent(user_message: str, history: List[ChatMessage]):
             model=OLLAMA_MODEL,
             messages=messages,
             format='json',
-            options={'temperature': 0.0}
+            options={
+                'temperature': 0.0,
+                'num_predict': 50  # 최대 50 토큰만 생성 (JSON만 필요하므로)
+            },
+            keep_alive='10m'  # 모델을 메모리에 10분간 유지
         )
         result = json.loads(response['message']['content'])
         if result.get("type") == "general":
