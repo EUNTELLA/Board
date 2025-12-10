@@ -29,11 +29,9 @@ const Comments = ({ comments, onCommentSubmit }) => {
             </form>
 
             <ul className="comment-list">
-                {/* comments가 존재하고, 0개 이상일 때만 목록을 렌더링합니다. */}
                 {comments && comments.length > 0 ? (
                     comments.map((comment, index) => (
                         <li key={comment._id || index} className="comment-item">
-                            {/* comment 객체 자체가 아닌, 그 안의 속성을 명시적으로 렌더링합니다. */}
                             <div className="comment-author">{comment.author}</div>
                             <p className="comment-content">{comment.content}</p>
                             <div className="comment-date">{new Date(comment.createdAt).toLocaleString()}</div>
@@ -48,4 +46,3 @@ const Comments = ({ comments, onCommentSubmit }) => {
 };
 
 export default Comments;
-

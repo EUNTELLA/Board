@@ -1,20 +1,10 @@
-// 제목 내용 입력 폼
-// 새글 작성 모드랑 수정모드
-// jwt 토큰을 사용한 api
-// 폼 유효성 검사
-
 import React, { useState, useEffect } from 'react';
 import './PostForm.css';
 
-// post: 수정할 때 전달받는 기존 글 데이터
-// onSubmit: '저장' 버튼 클릭 시 실행될 함수
-// onCancel: '취소' 버튼 클릭 시 실행될 함수
-// currentUser: 로그인한 사용자 정보
 const PostForm = ({ post, onSubmit, onCancel, currentUser }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
 
-    // 수정 모드일 경우, 폼에 기존 게시글 데이터를 채워줍니다.
     useEffect(() => {
         if (post) {
             setTitle(post.title);

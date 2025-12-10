@@ -1,13 +1,11 @@
 import React from 'react';
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  // 페이지 번호 배열 생성
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
 
-  // 표시할 페이지 번호가 없을 경우 아무것도 렌더링하지 않음
   if (totalPages <= 1) {
     return null;
   }

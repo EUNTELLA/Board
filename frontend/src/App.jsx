@@ -14,10 +14,9 @@ function App() {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [currentView, setCurrentView] = useState('list');
     const [selectedPost, setSelectedPost] = useState(null);
-    const [authView, setAuthView] = useState('login'); // 'login' or 'signup' 
+    const [authView, setAuthView] = useState('login');
     const [refreshKey, setRefreshKey] = useState(0);
 
-    // 페이지 새로 고침 후에도 로그인 상태 유지하기 위한 함수
     useEffect(() => {
         const token = localStorage.getItem('token');
         const user = localStorage.getItem('user');
@@ -53,8 +52,8 @@ function App() {
 
     const handleBackToList = () => {
         setCurrentView('list');
-        setSelectedPost(null); // selectedPost를 null로 초기화
-        setRefreshKey(prevKey => prevKey + 1); // +1을 해서 상태 변경을 알림
+        setSelectedPost(null);
+        setRefreshKey(prevKey => prevKey + 1);
     };
 
     const handlePostSelect = (postId) => {
@@ -70,7 +69,7 @@ function App() {
                 const response = await fetch(`${API_URL}/${postId}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error('삭제 실패');
                 alert('게시글이 삭제되었습니다.');
-                handleBackToList(); // 삭제 후 목록으로 돌아가면서 새로고침
+                handleBackToList();
             } catch (error) {
                 console.error('삭제 오류:', error);
                 alert('삭제 중 오류가 발생했습니다.');
@@ -98,7 +97,7 @@ function App() {
                 if (!response.ok) throw new Error('생성 실패');
                 alert('새로운 게시글이 작성되었습니다.');
             }
-            handleBackToList(); // 저장 후 목록으로 돌아가면서 새로고침
+            handleBackToList();
         } catch (error) {
             console.error('저장 오류:', error);
             alert('저장 중 오류가 발생했습니다.');
@@ -106,7 +105,6 @@ function App() {
     };
 
     const renderMainContent = () => {
-        // 로그인하지 않은 경우 로그인/회원가입 화면 표시
         if (!isLoggedIn) {
             if (authView === 'signup') {
                 return <Signup onSignup={handleSignup} onSwitchToLogin={() => setAuthView('login')} />;
@@ -114,7 +112,6 @@ function App() {
             return <Login onLogin={handleLogin} onSwitchToSignup={() => setAuthView('signup')} />;
         }
 
-        // 로그인한 경우 게시판 화면 표시
         switch (currentView) {
             case 'detail':
                 return <PostDetail postId={selectedPost} onBackToList={handleBackToList} onEdit={handleEditPost} onDelete={handleDeletePost} />;
@@ -127,7 +124,13 @@ function App() {
 
     return (
         <div className="text-center">
-            <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} currentUser={currentUser} />
+            <Header 
+                isLoggedIn={isLoggedIn} 
+                onLogout={handleLogout} 
+                currentUser={currentUser}
+                onHomeClick={handleBackToList}
+                onNewPostClick={handleNewPost}
+            />
             <main className="px-5">
                 {renderMainContent()}
             </main>

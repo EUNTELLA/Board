@@ -39,8 +39,6 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
                 throw new Error(data.message || 'Login failed.');
             }
 
-            // 로그인 성공 시 토큰과 사용자 정보를 로컬 스토리지에 저장
-
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             onLogin(data.user);
@@ -54,7 +52,6 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
 
     return (
         <div className="flex justify-center items-center min-h-[calc(100vh-80px)] p-5 relative overflow-hidden">
-            {/* Floating background effects */}
             <div className="absolute w-[500px] h-[500px] bg-gradient-radial from-pink-300/30 to-transparent -top-[250px] -left-[250px] animate-float" />
             <div className="absolute w-[400px] h-[400px] bg-gradient-radial from-purple-400/30 to-transparent -bottom-[200px] -right-[200px] animate-float-reverse" />
 
